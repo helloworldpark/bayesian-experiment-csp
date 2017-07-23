@@ -47,34 +47,25 @@ class odeSolver:
         return x
     
     def solve(self):
-        dt = (self.inputForOde.time.tTo - self.inputForOde.time.tFrom) / float(self.inputForOde.tIntervals)
+        dt = (self.inputForOde.time.tTo - self.inputForOde.time.tFrom) / float(self.inputForOde.time.tIntervals)
         
         oldval = np.zeros((1,self.inputForOde.dimension()))
-        newval = np.zeros((1,self.inputForOde.dimension()))
+        # new value is set to the initial data at first
+        newval = self.inputForOde.initialValues
         
         # save initial data to output
-        self.outputForOde.results[0] = self.inputForOde.initialValues
+        self.outputForOde.results[0] = newval
         
-        # new value is set to the initial data at first
-        newval = self.outputForOde.results[0]
-        
-        for i in range(1, self.inputForOde.length):
+        for i in range(1, self.inputForOde.length()):
             # move new values to old values
             oldval = newval
             
             tOld = self.inputForOde.time.tFrom + float(i-1) * dt
             
-            k1 = equation(tOld, oldval)
-            fTemp = 0.5 * dt * k1 + oldval
-            
-            k2 = equation(tOld + 0.5 * dt, fTemp)
-            fTemp = 0.5 * dt * k2 + oldval
-            
-            k3 = equation(tOld + 0.5 * dt, fTemp)
-            fTemp = 0.5 * dt * k3 + oldval
-            
-            k4= equation(tOld + 0.5 * dt, fTemp)
-            fTemp = 0.5 * dt * k3 + oldval
+            k1 = self.equation(tOld, oldval)
+            k2 = self.equation(tOld + 0.5 * dt, 0.5 * dt * k1 + oldval)
+            k3 = self.equation(tOld + 0.5 * dt, 0.5 * dt * k2 + oldval)
+            k4 = self.equation(tOld + 1.0 * dt, 0.5 * dt * k3 + oldval)
             
             newval = oldval + (dt / 6.0) * (1.0 * k1 + 2.0 * k2 + 2.0 * k3 + 1.0 * k4)
             
@@ -84,8 +75,8 @@ class odeSolver:
         print("Solved ODE")
         print("Initial value: ", self.inputForOde.initialValues)
         print("Output:")
-        dt = (self.inputForOde.time.tTo - self.inputForOde.time.tFrom) / float(self.inputForOde.tIntervals)
-        for i in range(0, self.outputForOde.length):
+        dt = (self.inputForOde.time.tTo - self.inputForOde.time.tFrom) / float(self.inputForOde.time.tIntervals)
+        for i in range(0, self.outputForOde.length()):
             t = self.inputForOde.time.tFrom + dt * float(i)
             print("t: ", t, "y: ", self.outputForOde.results[i])
         
