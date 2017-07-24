@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plot
 
 
 class OdeTime:
@@ -35,6 +36,7 @@ class OdeOutput:
     def __init__(self, ode_input):
         self.ode_input = ode_input
         self.results = np.zeros((ode_input.length(), ode_input.dimension()))
+        self.times = np.zeros((ode_input.length(), 1))
     
     def length(self):
         return self.ode_input.length()
@@ -61,6 +63,7 @@ class OdeSolver:
         
         # save initial data to output
         self.ode_output.results[0] = new_value
+        self.ode_output.times[0] = self.ode_input.time.time(0)
         
         for i in range(1, self.ode_input.length()):
             # move new values to old values
@@ -76,6 +79,7 @@ class OdeSolver:
             new_value = old_value + (dt / 6.0) * (1.0 * k1 + 2.0 * k2 + 2.0 * k3 + 1.0 * k4)
             
             self.ode_output.results[i] = new_value
+            self.ode_output.times[i] = self.ode_input.time.time(i)
             
     def print_result(self):
         print("Solved ODE")
@@ -85,3 +89,8 @@ class OdeSolver:
             t = self.ode_input.time.time(i)
             print("t: ", t, "y: ", self.ode_output.results[i])
 
+    def print_graph(self):
+        x = self.ode_output.times
+        for i in range(0, self.ode_output.dimension()):
+            plot.plot(x, self.ode_output.results[:, i])
+        plot.show()
