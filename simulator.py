@@ -1,17 +1,12 @@
 import numpy as np
 
 
-class Simulatable:
+class OdeSimulator:
 
-    def simulate(self, t):
-        raise NotImplementedError("Method simulate is not implemented")
-
-
-class Simulator:
-
-    def __init__(self, simulatable, stdev=1.0):
-        self.simulatable = simulatable
+    def __init__(self, odesolver, stdev=1.0):
+        self.odesolver = odesolver
         self.stdev = stdev
+        self.odesolver.solve()
 
     def simulate(self, t):
-        return self.simulatable.simulate(t) + np.random.normal(scale=self.stdev)
+        return self.odesolver.value(t) + np.random.normal(scale=self.stdev)

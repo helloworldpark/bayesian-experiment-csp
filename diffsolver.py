@@ -94,3 +94,19 @@ class OdeSolver:
         for i in range(0, self.ode_output.dimension()):
             plot.plot(x, self.ode_output.results[:, i])
         plot.show()
+
+    def value(self, t):
+        imin = 0
+        imax = self.ode_output.times.shape[0]-1
+        i = int((imax + imin) / 2)
+        while (imax - imin) > 1:
+            if t < self.ode_output.times[i, 0]:
+                imax = i
+                i = int((imax + imin) / 2)
+            elif t > self.ode_output.times[i, 0]:
+                imin = i
+                i = int((imax + imin) / 2)
+            else:
+                return self.ode_output.results[i, :]
+        return self.ode_output.results[i, :]
+

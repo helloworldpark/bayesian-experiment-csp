@@ -11,8 +11,16 @@ class DiscreteModel:
         for item, prob in zip(items, probs):
             self.prob_dict[item] = prob
 
-    def update(self, data, hypothesis, likelihood):
-        self.prob_dict[hypothesis] *= likelihood(data, hypothesis)
+    def likelihood(self, data, hypothesis):
+        raise NotImplementedError("Implement likelihood")
+
+    def update(self, data, hypothesis):
+        self.prob_dict[hypothesis] *= self.likelihood(data, hypothesis)
+
+    def update_all(self, data):
+        for hypo in self.prob_dict:
+            self.update(data, hypo)
+        self.normalize()
 
     def normalize(self):
         total = 0.0
